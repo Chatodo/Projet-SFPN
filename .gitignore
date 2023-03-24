@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+main[1-9]
+test[1-9]
+.vscode/
