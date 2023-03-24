@@ -19,7 +19,7 @@
 	#include "matrice128.h"
 	int main() {
 		WORD128 mat1[DIM];
-		input_mat128(mat1);
+		matrice_1(mat1);
 		printf("\nmatrice 1 :\n");
 		print_mat128(mat1);
 		return 0;

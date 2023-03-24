@@ -56,15 +56,17 @@ int main() {
         test_transpose(mat3, mat3); // Test 3
     #elif defined(TRANSPOSE2)
         // Partie 128 bits
-        WORD128 mat4[DIM], mat5[DIM], mat6[DIM];
-        input_mat128(mat4);
-        init_zero128(mat5);
-        Transpose128(mat5, mat4);
-        init_zero128(mat6);
+        WORD128 mat1[DIM], mat2[DIM], mat3[DIM], mat4[DIM];
+        input_mat128(mat1);
+        init_zero128(mat2);
+        Transpose128(mat2, mat1);
+        init_zero128(mat3);
         printf("1..3\n"); // Nombre de tests
-        test_transpose128(mat5, mat4); // Test 1
-        test_transpose128(mat4, mat5); // Test 2
-        test_transpose128(mat6, mat6); // Test 3
+        test_transpose128(mat2, mat1); // Test 1
+        test_transpose128(mat1, mat2); // Test 2
+        test_transpose128(mat3, mat3); // Test 3
+        matrice_1(mat4);
+        test_transpose128(mat4, mat4); // Test 4
     #endif
     return 0;
 }

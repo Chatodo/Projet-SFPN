@@ -15,15 +15,9 @@
 #define Cst16 0x0000ffff0000ffff
 #define Cst32 0x00000000ffffffffULL
 #define WORD uint64_t
-typedef struct {
-    uint64_t lo;
-    uint64_t hi;
-}word128;
-#define WORD128 word128
 //-------------PROTOTYPES-------------
 // Fonction pour initialiser une matrice avec des valeurs prédéfinies
 void input_mat(WORD mat[DIM]);
-void input_mat128(WORD128 mat[DIM]);
 
 // Fonction pour initialiser une matrice avec des valeurs nulles
 void init_zero(WORD mat[DIM]);
