@@ -4,7 +4,43 @@
 #include "matrice.h"
 #define bit(M,l,c) ((M[l]>>c)&1)
 #define flipbit(M,l,c) M[l]^=((uint64_t)1<<c)
+/*
+Une autre façon de faire la transposition
 
+int getbit(WORD mat[DIM], int l, int c) {
+    int index = l * DIM + c;
+    int word_index = index / DIM;
+    int bit_index = index % DIM;
+    return (mat[word_index] >> bit_index) & 1;
+}
+
+void setbit(WORD mat[DIM], int l, int c, int value) {
+    int index = l * DIM + c;
+    int word_index = index / DIM;
+    int bit_index = index % DIM;
+    if (value) {
+        mat[word_index] |= (WORD)1 << bit_index;
+    } else {
+        mat[word_index] &= ~((WORD)1 << bit_index);
+    }
+}
+void Transpose(WORD transp[DIM], WORD mat[DIM]) {
+    int l, c;
+    for (l = 0; l < DIM; l++) {
+        for (c = 0; c < DIM; c++) {
+            if (l != c) {
+                int bit_l_c = getbit(mat, l, c);
+                int bit_c_l = getbit(mat, c, l);
+                setbit(transp, l, c, bit_c_l);
+                setbit(transp, c, l, bit_l_c);
+            } else {
+                int bit_l_c = getbit(mat, l, c);
+                setbit(transp, l, c, bit_l_c);
+            }
+        }
+    }
+}
+*/
 void Transpose(WORD transp[DIM], WORD mat[DIM]) {
     int l,l0,l1;
     WORD val1,val2;
@@ -83,5 +119,39 @@ void print_mat(WORD mat[DIM]) {
             printf("%lu ",bit(mat,l,c));
         }
         printf("\n");
+    }
+}
+
+void init_identity(WORD mat[DIM]) {
+    int l;
+    for (l = 0; l < DIM; l++) {
+        mat[l] = 0;
+        flipbit(mat, l, l);
+    }
+}
+
+void init_all_ones(WORD mat[DIM]) {
+    int l;
+    for (l = 0; l < DIM; l++) {
+        mat[l] = ~(uint64_t)0;
+    }
+}
+
+void init_antidiagonal(WORD mat[DIM]) {
+    int l, c;
+    for (l = 0; l < DIM; l++) {
+        mat[l] = 0;
+        c = DIM - (1 + l);
+        flipbit(mat, l, c);
+    }
+}
+
+void init_symmetric(WORD mat[DIM]) {
+    int l, c;
+    for (l = 0; l < DIM; l++) {
+        mat[l] = 0;
+        for (c = 0; c <= l; c++) {
+            flipbit(mat, l, c);
+        }
     }
 }

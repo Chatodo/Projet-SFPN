@@ -18,10 +18,12 @@
 #elif defined(TRANSPOSE2)
 	#include "matrice128.h"
 	int main() {
-		WORD128 mat1[DIM];
+		WORD128 mat1[DIM]; WORD128 mat2[DIM];
 		matrice_1(mat1);
 		printf("\nmatrice 1 :\n");
 		print_mat128(mat1);
+		init_zero128(mat2);
+		print_mat128(mat2);
 		return 0;
 	}
 #endif

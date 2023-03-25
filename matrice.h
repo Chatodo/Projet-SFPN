@@ -22,6 +22,10 @@ void input_mat(WORD mat[DIM]);
 // Fonction pour initialiser une matrice avec des valeurs nulles
 void init_zero(WORD mat[DIM]);
 
+void init_identity(WORD mat[DIM]);
+void init_all_ones(WORD mat[DIM]);
+void init_antidiagonal(WORD mat[DIM]);
+void init_symmetric(WORD mat[DIM]);
 // Fonction pour afficher une matrice
 void print_mat(WORD mat[DIM]);
 
