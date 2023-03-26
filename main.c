@@ -1,5 +1,6 @@
-#ifdef TRANSPOSE1
-	#include "matrice.h"
+//Fichier test pour les matrices
+#include "matrice.h"
+#ifdef M64
 	int main() {
 		WORD mat1[DIM]; WORD mat2[DIM]; WORD mat3[DIM]; //int count;
 		input_mat(mat1);
@@ -15,14 +16,12 @@
 		print_mat(mat3);
 		return 0;
 	}
-#elif defined(TRANSPOSE2)
-	#include "matrice128.h"
+#elif defined(M128)
 	int main() {
-		WORD128 mat1[DIM]; WORD128 mat2[DIM];
-		matrice_1(mat1);
-		printf("\nmatrice 1 :\n");
-		print_mat128(mat1);
-		init_zero128(mat2);
+		WORD128 mat1[DIM], mat2[DIM];
+		init_identity128(mat1);
+		//print_mat128(mat1);
+		Transpose128(mat2, mat1);
 		print_mat128(mat2);
 		return 0;
 	}
