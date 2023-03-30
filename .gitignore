@@ -53,4 +53,5 @@ dkms.conf
 
 main[1-9]
 test[1-9]
+bench
 .vscode/

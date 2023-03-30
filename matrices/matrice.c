@@ -195,10 +195,18 @@ void init_zero128(WORD128 mat[DIM]) {
 	}
 }
 void init_identity128(WORD128 mat[DIM]) {
-	for (int i = 0; i < DIM; i++) {
-        mat[i].lo = 0;
-        mat[i].hi = 0;
-        flipbit128(mat, i, i);
+    // Iterate through each row of the matrix
+    for (int row = 0; row < DIM; row++) {
+        // Initialize lo and hi values to zero
+        mat[row].lo = 0;
+        mat[row].hi = 0;
+
+        // Set the diagonal element to 1
+        if (row < 64) {
+            mat[row].lo |= (uint64_t)1 << row;
+        } else {
+            mat[row].hi |= (uint64_t)1 << (row - 64);
+        }
     }
 }
 
@@ -274,7 +282,6 @@ void init_symmetric128(WORD128 mat[DIM]) {
 //         }
 //     }
 // }
-
 void Transpose128(word128 transp[DIM], word128 mat[DIM]) {
 	int l, l0, l1;
 	word128 val1, val2;

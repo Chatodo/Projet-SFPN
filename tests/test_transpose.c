@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdbool.h>
-#include "matrice.h"
+#include "../matrices/matrice.h"
 
 #ifdef M64
 	bool test_transpose(WORD expected[DIM], WORD input[DIM]) {
@@ -35,8 +35,9 @@
 		bool test = true;
 		for (int i = 0; i < DIM; i++) {
 			if (result[i].lo != expected[i].lo || result[i].hi != expected[i].hi) {
-				printf("\n---Erreur it : %d\n", i);
-				printf("result[i].lo = %lu result[i].hi = %lu \nexpected[i].lo = %lu expected[i].hi = %lu \n---", result[i].lo, result[i].hi, expected[i].lo,expected[i].hi);
+				printf("\n---Erreur à la position (%d,%d):\n", i % 128, i / 128);
+            	printf("Valeur attendue: lo=%lu, hi=%lu\n", expected[i].lo, expected[i].hi);
+            	printf("Valeur réelle:   lo=%lu, hi=%lu\n", result[i].lo, result[i].hi);
 				test = false;
 				break;
 			}
