@@ -45,6 +45,7 @@ void Transpose(WORD transp[DIM], WORD mat[DIM]);
 #elif(M128)
 //-------------DEFINITON--------------
 //Dimension 128 bits
+#define DIM64 64
 #define DIM 128
 #define Cst1 0x5555555555555555
 #define Cst2 0x3333333333333333
@@ -78,7 +79,9 @@ void init_symmetric128(WORD128 mat[DIM]);
 // La fonction Transpose transpose la matrice "mat" et stocke le résultat dans la matrice "transp". 
 // Principe : divise la matrice en groupes de lignes et en échange les parties gauche et droite des mots de chaque ligne. (en bit à bit)
 // Méthode parallèle
-void Transpose128(word128 transp[DIM], word128 mat[DIM]);
+// void Transpose128(word128 transp[DIM], word128 mat[DIM]);
+void Transpose(WORD transp[DIM64], WORD mat[DIM64]);
+void Transpose128(WORD128 transp[DIM], WORD128 mat[DIM]);
 #endif
 
 #endif

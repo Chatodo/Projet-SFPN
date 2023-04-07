@@ -158,6 +158,7 @@ void init_symmetric(WORD mat[DIM]) {
 		}
 	}
 }
+
 #elif(M128)
 #define bit128(M, l, c) (((c) < 64) ? ((M[l].lo >> (c)) & 1) : ((M[l].hi >> ((c)-64)) & 1))
 #define flipbit128(M, l, c) (((c) < 64) ? (M[l].lo ^= ((uint64_t)1 << (c))) : (M[l].hi ^= ((uint64_t)1 << ((c)-64))))
@@ -196,17 +197,10 @@ void init_zero128(WORD128 mat[DIM]) {
 }
 void init_identity128(WORD128 mat[DIM]) {
     // Iterate through each row of the matrix
-    for (int row = 0; row < DIM; row++) {
-        // Initialize lo and hi values to zero
-        mat[row].lo = 0;
-        mat[row].hi = 0;
-
-        // Set the diagonal element to 1
-        if (row < 64) {
-            mat[row].lo |= (uint64_t)1 << row;
-        } else {
-            mat[row].hi |= (uint64_t)1 << (row - 64);
-        }
+    for (int l = 0; l < DIM; l++) {
+        mat[l].lo = 0;
+        mat[l].hi = 0;
+        flipbit128(mat, l, l);
     }
 }
 
@@ -282,84 +276,176 @@ void init_symmetric128(WORD128 mat[DIM]) {
 //         }
 //     }
 // }
-void Transpose128(word128 transp[DIM], word128 mat[DIM]) {
-	int l, l0, l1;
-	word128 val1, val2;
 
-	for (l = 0; l < DIM / 2; l++) {
-		transp[l].lo = (mat[l].lo & Cst32) | ((mat[l + (DIM / 2)].lo & Cst32) << 32);
-        transp[l].hi = (mat[l].hi & Cst32) | ((mat[l + (DIM / 2)].hi & Cst32) << 32);
-        transp[l + (DIM / 2)].lo = ((mat[l].lo >> 32) & Cst32) | (mat[l + (DIM / 2)].lo & (Cst32 << 32));
-        transp[l + (DIM / 2)].hi = ((mat[l].hi >> 32) & Cst32) | (mat[l + (DIM / 2)].hi & (Cst32 << 32));
-	}
 
-	for (l0 = 0; l0 < 2; l0++) {
-		for (l1 = 0; l1 < DIM / 4; l1++) {
-			l = l0 * (DIM / 2) + l1;
-			val1.lo = (transp[l].lo & Cst16) | ((transp[l + (DIM / 4)].lo & Cst16) << 16);
-			val1.hi = (transp[l].hi & Cst16) | ((transp[l + (DIM / 4)].hi & Cst16) << 16);
-			val2.lo = ((transp[l].lo >> 16) & Cst16) | (transp[l + (DIM / 4)].lo & (Cst16 << 16));
-			val2.hi = ((transp[l].hi >> 16) & Cst16) | (transp[l + (DIM / 4)].hi & (Cst16 << 16));
-			transp[l] = val1;
-			transp[l + (DIM / 4)] = val2;
-		}
-	}
+// void Transpose128(word128 transp[DIM], word128 mat[DIM]) {
+// 	int l, l0, l1;
+// 	word128 val1, val2;
 
-	for (l0 = 0; l0 < 4; l0++) {
-		for (l1 = 0; l1 < DIM / 8; l1++) {
-			l = l0 * (DIM / 4) + l1;
-			val1.lo = (transp[l].lo & Cst8) | ((transp[l + (DIM / 8)].lo & Cst8) << 8);
-			val1.hi = (transp[l].hi & Cst8) | ((transp[l + (DIM / 8)].hi & Cst8) << 8);
-			val2.lo = ((transp[l].lo >>8) & Cst8) | (transp[l + (DIM / 8)].lo & (Cst8 << 8));
-			val2.hi = ((transp[l].hi >> 8) & Cst8) | (transp[l + (DIM / 8)].hi & (Cst8 << 8));
-			transp[l] = val1;
-            transp[l + (DIM / 8)] = val2;
-		}
-	}
+// 	for (l = 0; l < DIM / 2; l++) {
+// 		transp[l].lo = (mat[l].lo & Cst32) | ((mat[l + (DIM / 2)].lo & Cst32) << 32);
+//         transp[l].hi = (mat[l].hi & Cst32) | ((mat[l + (DIM / 2)].hi & Cst32) << 32);
+//         transp[l + (DIM / 2)].lo = ((mat[l].lo >> 32) & Cst32) | (mat[l + (DIM / 2)].lo & (Cst32 << 32));
+//         transp[l + (DIM / 2)].hi = ((mat[l].hi >> 32) & Cst32) | (mat[l + (DIM / 2)].hi & (Cst32 << 32));
+// 	}
 
-	for (l0 = 0; l0 < 8; l0++) {
-		for (l1 = 0; l1 < DIM / 16; l1++) {
-			l = l0 * (DIM / 8) + l1;
-			val1.lo = (transp[l].lo & Cst4) | ((transp[l + (DIM / 16)].lo & Cst4) << 4);
-			val1.hi = (transp[l].hi & Cst4) | ((transp[l + (DIM / 16)].hi & Cst4) << 4);
-			val2.lo = ((transp[l].lo >> 4) & Cst4) | (transp[l + (DIM / 16)].lo & (Cst4 << 4));
-			val2.hi = ((transp[l].hi >> 4) & Cst4) | (transp[l + (DIM / 16)].hi & (Cst4 << 4));
-			transp[l] = val1;
-			transp[l + (DIM / 16)] = val2;
-			}
-	}
+// 	for (l0 = 0; l0 < 2; l0++) {
+// 		for (l1 = 0; l1 < DIM / 4; l1++) {
+// 			l = l0 * (DIM / 2) + l1;
+// 			val1.lo = (transp[l].lo & Cst16) | ((transp[l + (DIM / 4)].lo & Cst16) << 16);
+// 			val1.hi = (transp[l].hi & Cst16) | ((transp[l + (DIM / 4)].hi & Cst16) << 16);
+// 			val2.lo = ((transp[l].lo >> 16) & Cst16) | (transp[l + (DIM / 4)].lo & (Cst16 << 16));
+// 			val2.hi = ((transp[l].hi >> 16) & Cst16) | (transp[l + (DIM / 4)].hi & (Cst16 << 16));
+// 			transp[l] = val1;
+// 			transp[l + (DIM / 4)] = val2;
+// 		}
+// 	}
 
-	for (l0 = 0; l0 < 16; l0++) {
-		for (l1 = 0; l1 < DIM / 32; l1++) {
-			l = l0 * (DIM / 16) + l1;
-			val1.lo = (transp[l].lo & Cst2) | ((transp[l + (DIM / 32)].lo & Cst2) << 2);
-			val1.hi = (transp[l].hi & Cst2) | ((transp[l + (DIM / 32)].hi & Cst2) << 2);
-			val2.lo = ((transp[l].lo >> 2) & Cst2) | (transp[l + (DIM / 32)].lo & (Cst2 << 2));
-			val2.hi = ((transp[l].hi >> 2) & Cst2) | (transp[l + (DIM / 32)].hi & (Cst2 << 2));
-			transp[l] = val1;
-			transp[l + (DIM / 32)] = val2;
-		}
-	}
+// 	for (l0 = 0; l0 < 4; l0++) {
+// 		for (l1 = 0; l1 < DIM / 8; l1++) {
+// 			l = l0 * (DIM / 4) + l1;
+// 			val1.lo = (transp[l].lo & Cst8) | ((transp[l + (DIM / 8)].lo & Cst8) << 8);
+// 			val1.hi = (transp[l].hi & Cst8) | ((transp[l + (DIM / 8)].hi & Cst8) << 8);
+// 			val2.lo = ((transp[l].lo >>8) & Cst8) | (transp[l + (DIM / 8)].lo & (Cst8 << 8));
+// 			val2.hi = ((transp[l].hi >> 8) & Cst8) | (transp[l + (DIM / 8)].hi & (Cst8 << 8));
+// 			transp[l] = val1;
+//             transp[l + (DIM / 8)] = val2;
+// 		}
+// 	}
 
-	for (l0 = 0; l0 < 32; l0++) {
-		for (l1 = 0; l1 < DIM / 64; l1++) {
-			l = l0 * (DIM / 32) + l1;
-			val1.lo = (transp[l].lo & Cst1) | ((transp[l + (DIM / 64)].lo & Cst1) << 1);
-			val1.hi = (transp[l].hi & Cst1) | ((transp[l + (DIM / 64)].hi & Cst1) << 1);
-			val2.lo = ((transp[l].lo >> 1) & Cst1) | (transp[l + (DIM / 64)].lo & (Cst1 << 1));
-			val2.hi = ((transp[l].hi >> 1) & Cst1) | (transp[l + (DIM / 64)].hi & (Cst1 << 1));
-			transp[l] = val1;
-			transp[l + (DIM / 64)] = val2;
-		}
-	}
+// 	for (l0 = 0; l0 < 8; l0++) {
+// 		for (l1 = 0; l1 < DIM / 16; l1++) {
+// 			l = l0 * (DIM / 8) + l1;
+// 			val1.lo = (transp[l].lo & Cst4) | ((transp[l + (DIM / 16)].lo & Cst4) << 4);
+// 			val1.hi = (transp[l].hi & Cst4) | ((transp[l + (DIM / 16)].hi & Cst4) << 4);
+// 			val2.lo = ((transp[l].lo >> 4) & Cst4) | (transp[l + (DIM / 16)].lo & (Cst4 << 4));
+// 			val2.hi = ((transp[l].hi >> 4) & Cst4) | (transp[l + (DIM / 16)].hi & (Cst4 << 4));
+// 			transp[l] = val1;
+// 			transp[l + (DIM / 16)] = val2;
+// 			}
+// 	}
+
+// 	for (l0 = 0; l0 < 16; l0++) {
+// 		for (l1 = 0; l1 < DIM / 32; l1++) {
+// 			l = l0 * (DIM / 16) + l1;
+// 			val1.lo = (transp[l].lo & Cst2) | ((transp[l + (DIM / 32)].lo & Cst2) << 2);
+// 			val1.hi = (transp[l].hi & Cst2) | ((transp[l + (DIM / 32)].hi & Cst2) << 2);
+// 			val2.lo = ((transp[l].lo >> 2) & Cst2) | (transp[l + (DIM / 32)].lo & (Cst2 << 2));
+// 			val2.hi = ((transp[l].hi >> 2) & Cst2) | (transp[l + (DIM / 32)].hi & (Cst2 << 2));
+// 			transp[l] = val1;
+// 			transp[l + (DIM / 32)] = val2;
+// 		}
+// 	}
+
+// 	for (l0 = 0; l0 < 32; l0++) {
+// 		for (l1 = 0; l1 < DIM / 64; l1++) {
+// 			l = l0 * (DIM / 32) + l1;
+// 			val1.lo = (transp[l].lo & Cst1) | ((transp[l + (DIM / 64)].lo & Cst1) << 1);
+// 			val1.hi = (transp[l].hi & Cst1) | ((transp[l + (DIM / 64)].hi & Cst1) << 1);
+// 			val2.lo = ((transp[l].lo >> 1) & Cst1) | (transp[l + (DIM / 64)].lo & (Cst1 << 1));
+// 			val2.hi = ((transp[l].hi >> 1) & Cst1) | (transp[l + (DIM / 64)].hi & (Cst1 << 1));
+// 			transp[l] = val1;
+// 			transp[l + (DIM / 64)] = val2;
+// 		}
+// 	}
 	
-	for (l = 0; l < DIM; l += 2) {
-		val1.lo = (transp[l].lo & Cst1) | ((transp[l + 1].lo & Cst1) << 1);
-		val1.hi = (transp[l].hi & Cst1) | ((transp[l + 1].hi & Cst1) << 1);
-		val2.lo = ((transp[l].lo >> 1) & Cst1) | (transp[l + 1].lo & (Cst1 << 1));
-		val2.hi = ((transp[l].hi >> 1) & Cst1) | (transp[l + 1].hi & (Cst1 << 1));
-		transp[l] = val1;
-		transp[l + 1] = val2;
+// 	for (l = 0; l < DIM; l += 2) {
+// 		val1.lo = (transp[l].lo & Cst1) | ((transp[l + 1].lo & Cst1) << 1);
+// 		val1.hi = (transp[l].hi & Cst1) | ((transp[l + 1].hi & Cst1) << 1);
+// 		val2.lo = ((transp[l].lo >> 1) & Cst1) | (transp[l + 1].lo & (Cst1 << 1));
+// 		val2.hi = ((transp[l].hi >> 1) & Cst1) | (transp[l + 1].hi & (Cst1 << 1));
+// 		transp[l] = val1;
+// 		transp[l + 1] = val2;
+// 	}
+// }
+
+void Transpose(WORD transp[DIM64], WORD mat[DIM64]) {
+	int l,l0,l1;
+	WORD val1,val2;
+	for (l=0;l<DIM64/2;l++) {
+		transp[l]=(mat[l]&Cst32)|((mat[l+(DIM64/2)]&Cst32)<<32);
+		transp[l+(DIM64/2)]=((mat[l]>>32)&Cst32)| (mat[l+(DIM64/2)]&(Cst32<<32));
 	}
+	for(l0=0;l0<2;l0++)
+		for (l1=0;l1<DIM64/4;l1++) {
+			l=l0*(DIM64/2)+l1;
+			val1=(transp[l]&Cst16)|((transp[l+(DIM64/4)]&Cst16)<<16);
+			val2=((transp[l]>>16)&Cst16)|(transp[l+(DIM64/4)]&(Cst16<<16));
+			transp[l]=val1; transp[l+(DIM64/4)]=val2;
+		}
+	for(l0=0;l0<4;l0++)
+		for (l1=0;l1<DIM64/8;l1++) {
+			l=l0*(DIM64/4)+l1;
+			val1=(transp[l]&Cst8)|((transp[l+(DIM64/8)]&Cst8)<<8);
+			val2=((transp[l]>>8)&Cst8)|(transp[l+(DIM64/8)]&(Cst8<<8));
+			transp[l]=val1; transp[l+(DIM64/8)]=val2;
+		}
+	for(l0=0;l0<8;l0++)
+		for (l1=0;l1<DIM64/16;l1++) {
+			l=l0*(DIM64/8)+l1;
+			val1=(transp[l]&Cst4)|((transp[l+(DIM64/16)]&Cst4)<<4);
+			val2=((transp[l]>>4)&Cst4)|(transp[l+(DIM64/16)]&(Cst4<<4));
+			transp[l]=val1; transp[l+(DIM64/16)]=val2;
+		}
+	for(l0=0;l0<16;l0++)
+		for (l1=0;l1<DIM64/32;l1++) {
+			l=l0*(DIM64/16)+l1;
+			val1=(transp[l]&Cst2)|((transp[l+(DIM64/32)]&Cst2)<<2);
+			val2=((transp[l]>>2)&Cst2)|(transp[l+(DIM64/32)]&(Cst2<<2));
+			transp[l]=val1; transp[l+(DIM64/32)]=val2;
+		}
+	for(l0=0;l0<32;l0++)
+		for (l1=0;l1<DIM64/64;l1++) {
+			l=l0*(DIM64/32)+l1;
+			val1=(transp[l]&Cst1)|((transp[l+(DIM64/64)]&Cst1)<<1);
+			val2=((transp[l]>>1)&Cst1)|(transp[l+(DIM64/64)]&(Cst1<<1));
+			transp[l]=val1; transp[l+(DIM64/64)]=val2;
+		}
+	for (l=0;l<DIM64;l+=2) {
+		val1=(transp[l]&Cst1)|((transp[l+1]&Cst1)<<1);
+		val2=((transp[l]>>1)&Cst1)|(transp[l+1]&(Cst1<<1));
+		transp[l]=val1; transp[l+1]=val2;
+	}
+}
+
+void Transpose128(WORD128 transp[DIM], WORD128 mat[DIM]) {
+    WORD temp64[DIM64];
+    int i;
+
+    for (i = 0; i < DIM64; i++) {
+        temp64[i] = mat[i].lo;
+    }
+    Transpose(temp64, temp64);
+
+    for (i = 0; i < DIM64; i++) {
+        transp[i].lo = temp64[i];
+    }
+
+    for (i = 0; i < DIM64; i++) {
+        temp64[i] = mat[i + DIM64].lo;
+    }
+    Transpose(temp64, temp64);
+
+    for (i = 0; i < DIM64; i++) {
+        transp[i].hi = temp64[i];
+    }
+
+    for (i = 0; i < DIM64; i++) {
+        temp64[i] = mat[i].hi;
+    }
+    Transpose(temp64, temp64);
+
+    for (i = 0; i < DIM64; i++) {
+        transp[i + DIM64].lo = temp64[i];
+    }
+
+    for (i = 0; i < DIM64; i++) {
+        temp64[i] = mat[i + DIM64].hi;
+    }
+    Transpose(temp64, temp64);
+
+    for (i = 0; i < DIM64; i++) {
+        transp[i + DIM64].hi = temp64[i];
+    }
 }
 #endif
