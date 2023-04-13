@@ -82,6 +82,7 @@ void init_symmetric128(WORD128 mat[DIM]);
 // void Transpose128(word128 transp[DIM], word128 mat[DIM]);
 void Transpose(WORD transp[DIM64], WORD mat[DIM64]);
 void Transpose128(WORD128 transp[DIM], WORD128 mat[DIM]);
+void Transpose128_Naif(WORD128 transp[DIM], WORD128 mat[DIM]);
 #endif
 
 #endif

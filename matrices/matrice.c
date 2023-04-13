@@ -234,49 +234,21 @@ void init_symmetric128(WORD128 mat[DIM]) {
 	}
 }
 
+void Transpose128_Naif(WORD128 mat[DIM], WORD128 transp[DIM]) {
+    init_zero128(transp);
 
-// La même chose que la version 64bits
+    for (int i = 0; i < DIM; i++) {
+        for (int j = 0; j < DIM; j++) {
+            uint64_t bit = bit128(mat, i, j);
+            if (bit) {
+                flipbit128(transp, j, i);
+            }
+        }
+    }
+}
 
-// int getbit(WORD128 mat[DIM], int l, int c) {
-//     int bit_index = c % 64;
-//     WORD word = (c < 64) ? mat[l].lo : mat[l].hi;
-//     return (word >> bit_index) & 1;
-// }
 
-// void setbit(WORD128 mat[DIM], int l, int c, int value) {
-//     int bit_index = c % 64;
-//     if (value) {
-//         if (c < 64) {
-//             mat[l].lo |= (WORD)1 << bit_index;
-//         } else {
-//             mat[l].hi |= (WORD)1 << bit_index;
-//         }
-//     } else {
-//         if (c < 64) {
-//             mat[l].lo &= ~((WORD)1 << bit_index);
-//         } else {
-//             mat[l].hi &= ~((WORD)1 << bit_index);
-//         }
-//     }
-// }
-
-// void Transpose128(WORD128 transp[DIM], WORD128 mat[DIM]) {
-//     int l, c;
-//     for (l = 0; l < DIM; l++) {
-//         for (c = 0; c < DIM; c++) {
-//             if (l != c) {
-//                 int bit_l_c = getbit(mat, l, c);
-//                 int bit_c_l = getbit(mat, c, l);
-//                 setbit(transp, l, c, bit_c_l);
-//                 setbit(transp, c, l, bit_l_c);
-//             } else {
-//                 int bit_l_c = getbit(mat, l, c);
-//                 setbit(transp, l, c, bit_l_c);
-//             }
-//         }
-//     }
-// }
-
+// Ici c'est juste une modification de la version 64bits
 
 // void Transpose128(word128 transp[DIM], word128 mat[DIM]) {
 // 	int l, l0, l1;
@@ -359,6 +331,7 @@ void init_symmetric128(WORD128 mat[DIM]) {
 // 	}
 // }
 
+// Ici c'est la version 128 bits qui sera appellé par celle de 64 bits
 void Transpose(WORD transp[DIM64], WORD mat[DIM64]) {
 	int l,l0,l1;
 	WORD val1,val2;

@@ -5,7 +5,7 @@
 #include "../matrices/matrice.h"
 #define NB_TESTS 10
 //ifdef M64
-void measure_transpose(long long *values) {
+void measure_transpose(long long *values, void (*transpose_fonction)(word128[DIM], word128[DIM])) {
     int retval, EventSet = PAPI_NULL;
 
     //Les fonctions pour matrices 
@@ -41,7 +41,7 @@ void measure_transpose(long long *values) {
         }
 
         // Transpose
-        Transpose128(transp, mat);
+        transpose_fonction(transp, mat);
 
         // Stop the COUNT
         retval = PAPI_stop(EventSet, &values[i]);
@@ -56,10 +56,8 @@ void measure_transpose(long long *values) {
     PAPI_shutdown();
 }
 
-int main() {
-    long long values[NB_TESTS];
-    measure_transpose(values);
-    double moyenne = 0; 
+void afficher_result(long long *values) {
+    double moyenne = 0;
     for(int i = 0; i < NB_TESTS; i++){
         moyenne += values[i];
     }
@@ -73,5 +71,16 @@ int main() {
 
     printf("Nombre de cycles (en moyenne): %lf\n", moyenne);
     printf("Variance: %lf\n", variance);
+}
+
+int main() {
+    long long values[NB_TESTS];
+    printf("Transpose naif:\n");
+    measure_transpose(values, Transpose128_Naif);
+    afficher_result(values);
+    printf("--------------------------------:\n");
+    printf("Transpose Optimise:\n");
+    measure_transpose(values, Transpose128);
+    afficher_result(values);
     return 0;
 }
