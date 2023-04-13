@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include "../matrices/matrice.h"
+#define NB_TESTS 7
 
 #ifdef M64
 	bool test_transpose(WORD expected[DIM], WORD input[DIM]) {
@@ -93,15 +94,36 @@ int main() {
 		init_symmetric128(mat7);
 		//pour la symétrie
 		Transpose128(mat8,mat7); 
-
 		Transpose128(mat2, mat1);
-		printf("Test transpose: "); success &= test_transpose128(mat2, mat1); 
-		printf("Test transpose * 2: "); success &= test_transpose128(mat1, mat2);
-		printf("Test Matrice uniquement 0: "); success &= test_transpose128(mat3, mat3);
-		printf("Test matrice identité: "); success &= test_transpose128(mat4, mat4);
-		printf("Test matrice uniquement 1: "); success &= test_transpose128(mat5, mat5);
-		printf("Test matrice anti-diagonale: "); success &= test_transpose128(mat6, mat6);
-		printf("Test matrice symétrique: "); success &= test_transpose128(mat8, mat7);
-		return 0;
+		for(int i = 0; i < NB_TESTS; i++) {
+			switch (i) {
+				case 1:
+					printf("Test transpose: "); success &= test_transpose128(mat2, mat1); 
+					break;
+				case 2:
+					printf("Test transpose * 2: "); success &= test_transpose128(mat1, mat2);
+					break;
+				case 3:
+					printf("Test Matrice uniquement 0: "); success &= test_transpose128(mat3, mat3);
+					break;
+				case 4:
+					printf("Test matrice identité: "); success &= test_transpose128(mat4, mat4);
+					break;
+				case 5:
+					printf("Test matrice uniquement 1: "); success &= test_transpose128(mat5, mat5);
+					break;
+				case 6:
+					printf("Test matrice anti-diagonale: "); success &= test_transpose128(mat6, mat6);
+					break;
+				case 7:
+					printf("Test matrice symétrique: "); success &= test_transpose128(mat8, mat7);
+					break;	
+			}
+			if(!success) {
+						printf("Erreur au test %d\n", i);
+						exit(EXIT_FAILURE);
+					}	
+			}
+		return EXIT_SUCCESS;
 	#endif
 }
