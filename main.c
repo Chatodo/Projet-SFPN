@@ -73,4 +73,6 @@
 		//print_mat128(mat2);
 		return 0;
 	}
+	#elif defined(AVX2)
+	
 #endif
