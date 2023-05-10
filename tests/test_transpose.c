@@ -120,10 +120,10 @@ int main() {
 					break;	
 			}
 			if(!success) {
-						printf("Erreur au test %d\n", i);
-						exit(EXIT_FAILURE);
-					}	
-			}
+				printf("Erreur au test %d\n", i);
+				exit(EXIT_FAILURE);
+			}	
+		}
 		return EXIT_SUCCESS;
 	#endif
 }

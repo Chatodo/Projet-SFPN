@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+
 #include "matrice.h"
 
 #ifdef M64
@@ -410,5 +411,65 @@ void Transpose128(WORD128 transp[DIM], WORD128 mat[DIM]) {
     }
 }
 
+#elif(AVX2)
+void input_mat_AVX2(__m256i mat[DIM]) {
+    int l, c;
+    uint64_t temp[DIM] = {0};
+
+    for (l = 0; l < DIM; l++) {
+        for (c = DIM / 2; c < DIM; c++) {
+            temp[l] |= (uint64_t)1 << c;
+        }
+    }
+
+    for (l = 0; l < DIM; l += 4) {
+        mat[l / 4] = _mm256_set_epi64x(temp[l + 3], temp[l + 2], temp[l + 1], temp[l]);
+    }
+}
+
+void init_zero_AVX2(__m256i mat[DIM]) {
+    int l;
+    for (l = 0; l < DIM / 4; l++) {
+        mat[l] = _mm256_setzero_si256();
+    }
+}
+
+void Transpose128_AVX2(WORD128 transp[DIM], WORD128 mat[DIM]) {
+    __m256i tmp_lo[DIM64], tmp_hi[DIM64];
+    __m256i mat_lo[DIM], mat_hi[DIM];
+    int i;
+
+    // Charger les données de mat dans des registres AVX2
+    for (i = 0; i < DIM; ++i) {
+        mat_lo[i] = _mm256_loadu_si256((__m256i*)&mat[i].lo);
+        mat_hi[i] = _mm256_loadu_si256((__m256i*)&mat[i].hi);
+    }
+
+    // Transposer les parties basses et hautes
+    for (i = 0; i < DIM64; i++) {
+        tmp_lo[i] = _mm256_unpacklo_epi64(mat_lo[i], mat_lo[i + DIM64]);
+        tmp_hi[i] = _mm256_unpackhi_epi64(mat_lo[i], mat_lo[i + DIM64]);
+    }
+
+    for (i = 0; i < DIM64; i++) {
+        transp[i].lo = _mm256_extract_epi64(tmp_lo[i], 0);
+        transp[i].hi = _mm256_extract_epi64(tmp_lo[i], 2);
+        transp[i + DIM64].lo = _mm256_extract_epi64(tmp_hi[i], 0);
+        transp[i + DIM64].hi = _mm256_extract_epi64(tmp_hi[i], 2);
+    }
+
+    // Transposer les parties basses et hautes
+    for (i = 0; i < DIM64; i++) {
+        tmp_lo[i] = _mm256_unpacklo_epi64(mat_hi[i], mat_hi[i + DIM64]);
+        tmp_hi[i] = _mm256_unpackhi_epi64(mat_hi[i], mat_hi[i + DIM64]);
+    }
+
+    for (i = 0; i < DIM64; i++) {
+        transp[i].lo |= _mm256_extract_epi64(tmp_lo[i], 1) << 32;
+        transp[i].hi |= _mm256_extract_epi64(tmp_lo[i], 3) << 32;
+        transp[i + DIM64].lo |= _mm256_extract_epi64(tmp_hi[i], 1) << 32;
+        transp[i + DIM64].hi |= _mm256_extract_epi64(tmp_hi[i], 3) << 32;
+    }
+}
 
 #endif

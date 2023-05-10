@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Werror -std=c99 -pedantic -O3
 LIBS=-lpapi
 
-all: test1 test2 main1 main2 bench
+all: test1 test2 test3 main1 main2 main3 bench
 test1: clean
 	$(CC) $(CFLAGS) -DM64 -c tests/test_transpose.c -o test_transpose.o
 	$(CC) $(CFLAGS) -DM64 -c matrices/matrice.c -o matrice.o

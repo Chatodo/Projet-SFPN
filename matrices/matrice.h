@@ -83,6 +83,22 @@ void init_symmetric128(WORD128 mat[DIM]);
 void Transpose(WORD transp[DIM64], WORD mat[DIM64]);
 void Transpose128(WORD128 transp[DIM], WORD128 mat[DIM]);
 void Transpose128_Naif(WORD128 transp[DIM], WORD128 mat[DIM]);
-#endif
 
+#elif(AVX2)
+#include <immintrin.h>
+//-------------DEFINITON--------------
+//Dimension 256 bits
+#define DIM64 64
+#define DIM128 128
+#define DIM 256
+#define Cst1 0x5555555555555555
+#define Cst2 0x3333333333333333
+#define Cst4 0x0f0f0f0f0f0f0f0f
+#define Cst8 0x00ff00ff00ff00ff
+#define Cst16 0x0000ffff0000ffff
+#define Cst32 0x00000000ffffffffULL
+// Fonction pour initialiser une matrice avec des valeurs prédéfinies
+void input_mat_AVX2(__m256i mat[DIM]);
+
+#endif
 #endif
